@@ -1,0 +1,24 @@
+name: hello-java
+title: Hello Java
+summary: Sample Java application
+description: |
+  A Java application that prints "Hello World!" to standard output.
+version: '1.0.0'
+license: GPL-3.0
+icon: images/icon.png
+
+base: core20
+grade: devel
+confinement: strict
+
+apps:
+  hello-java:
+    command: bin/HelloJava
+  java:
+    command: bin/java
+
+parts:
+  hello-java:
+    plugin: make
+    source: .
+    build-packages: [openjdk-14-jdk-headless]

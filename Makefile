@@ -20,8 +20,11 @@ release = 11
 # Avoids OutOfMemoryError running jlink and jpackage
 maxheap = -XX:MaxHeapSize=1g
 
+# Debian architecture of build machine
+arch := $(shell dpkg --print-architecture)
+
 # Environment variables
-JAVA_HOME = /usr/lib/jvm/java-$(openjdk)-openjdk-amd64
+JAVA_HOME = /usr/lib/jvm/java-$(openjdk)-openjdk-$(arch)
 JUNIT_JAR = /usr/share/java/junit4.jar
 DESTDIR   = dist/$(project)
 
@@ -68,9 +71,6 @@ debian = --type deb --linux-package-name $(project) \
 
 # Java source files
 sources := $(shell find src -name "*.java")
-
-# Hardware architecture
-arch := $(shell dpkg --print-architecture)
 
 # Root source files for the Java compiler
 root_info = src/main/java/module-info.java

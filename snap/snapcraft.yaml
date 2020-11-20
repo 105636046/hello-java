@@ -20,5 +20,6 @@ apps:
 parts:
   hello-java:
     plugin: make
-    source: .
+    source: https://github.com/jgneff/hello-java.git
+    source-depth: 1
     build-packages: [openjdk-14-jdk-headless]

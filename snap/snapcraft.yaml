@@ -5,7 +5,6 @@ description: |
   A Java application that prints "Hello World!" to standard output.
 version: '1.0.0'
 license: GPL-3.0
-icon: images/icon.png
 
 base: core20
 grade: devel

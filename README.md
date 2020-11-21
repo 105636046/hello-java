@@ -9,13 +9,13 @@ The files in this project let you:
 * run and test the application, and
 * package its API documentation and source files.
 
-In addition to these standard artifacts, you can build packages for Linux that include a minimal Java runtime image. The table below shows the package file size and installed size when built with OpenJDK 15.
+In addition to these standard artifacts, you can build packages for Linux that include a minimal Java runtime image. The table below shows the package file size and installed size when built with OpenJDK 15. When installed, the Snap file is mounted as a compressed read-only file system, rather than extracted, so its size remains the same.
 
 | Package Type | File (MB) | Installed (MB) |
 | ------------ |:---------:|:--------------:|
 | Compressed archive | 14 | 43 |
 | Debian package     | 10 | 44 |
-| Snap package       | 12 | 44 |
+| Snap package       | 12 | 12 |
 
 Furthermore, on Debian-based Linux distributions like Ubuntu, you can build all of these artifacts locally using only the trusted software from your system's package repositories.
 

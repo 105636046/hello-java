@@ -1,8 +1,16 @@
 name: hello-java
-title: Hello Java
+title: Hello Java!
 summary: Sample Java application
 description: |
-  A Java application that prints "Hello World!" to standard output.
+  This project is my template for building and packaging Java
+  applications. It uses Maven conventions for its directory structure
+  and includes a sample application that prints "Hello World!" to
+  standard output. It runs only as a console application from the
+  Terminal with the command `hello-java`.
+
+  For more information, including the source code and build
+  files, see the README file for this project on GitHub
+  (https://github.com/jgneff/hello-java).
 version: '1.0.0'
 license: GPL-3.0+
 
@@ -24,7 +32,7 @@ apps:
     command: bin/java
 
 parts:
-  hello-java:
+  app:
     plugin: make
     source: https://github.com/jgneff/hello-java.git
     source-depth: 1

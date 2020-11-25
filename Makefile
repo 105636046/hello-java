@@ -10,7 +10,7 @@
 # To build with OpenJDK 15 on Ubuntu 20.10, run:
 #   $ make package JAVA_HOME=/usr/lib/jvm/java-15-openjdk-amd64
 # The Snapcraft "make" plugin runs this Makefile with:
-#   $ make; make install DESTDIR=/root/parts/hello-java/install
+#   $ make; make install DESTDIR=$SNAPCRAFT_PART_INSTALL
 # ======================================================================
 
 # JDK and target platform versions

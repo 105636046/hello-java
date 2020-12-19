@@ -1,162 +1,203 @@
 # ======================================================================
-# Makefile - builds the sample Java application
+# Makefile - builds the sample Java applications
+# Copyright (C) 2020 John Neffenger
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # This Makefile requires the following packages:
-#   make openjdk-14-jdk-headless
-# Additional packages are required, depending on the target:
-#   test    - junit4
-#   install - binutils
-#   linux   - fakeroot
-# To build with OpenJDK 15 on Ubuntu 20.10, run:
-#   $ make package JAVA_HOME=/usr/lib/jvm/java-15-openjdk-amd64
-# The Snapcraft "make" plugin runs this Makefile with:
+#   $ sudo apt install make openjdk-14-jdk-headless
+#   $ sudo apt install junit4 binutils fakeroot
+#
+# The Snapcraft Make plugin runs this Makefile with:
 #   $ make; make install DESTDIR=$SNAPCRAFT_PART_INSTALL
+#
+# Note: The jpackage tool is available in JDK 14 or later.
 # ======================================================================
 
-# JDK and target platform versions
-openjdk = 14
-release = 11
+# OpenJDK version
+jdk = 14
 
-# Avoids OutOfMemoryError running jlink and jpackage
-maxheap = -XX:MaxHeapSize=1g
+# Java release for source code and target platform
+rel = 11
+
+# Project information
+pkg = org.status6.hello
+app = hello-java
+ver = 1.0.0
+
+# Package metadata
+copyright   = "Copyright (C) 2020 John Neffenger"
+description = "Sample Java applications"
+vendor      = "John Neffenger"
+icon        = snap/gui/$(app).png
+license     = LICENSE
+email       = john@status6.com
+group       = "Development;Building;"
+revision    = 1
+category    = java
+
+# Launcher command names
+cmd_world = HelloWorld
+cmd_swing = HelloSwing
+
+# Module names
+mod_world = $(pkg).world
+mod_swing = $(pkg).swing
+
+# JAR file names
+jar_world = hello-world-$(ver).jar
+jar_swing = hello-swing-$(ver).jar
+jar_tests = hello-tests-$(ver).jar
+src_world = hello-world-$(ver)-sources.jar
+src_swing = hello-swing-$(ver)-sources.jar
+doc_world = hello-world-$(ver)-javadoc.jar
+doc_swing = hello-swing-$(ver)-javadoc.jar
 
 # Debian architecture of build machine
 arch := $(shell dpkg --print-architecture)
 
-# Environment variables
-JAVA_HOME = /usr/lib/jvm/java-$(openjdk)-openjdk-$(arch)
+# Package file names
+package_tar = $(app)-$(ver)-linux-$(arch).tar.gz
+package_deb = $(app)_$(ver)-$(revision)_$(arch).deb
+
+# Overridden by variables from the environment
+JAVA_HOME ?= /usr/lib/jvm/java-$(jdk)-openjdk-$(arch)
+
+# Overridden by variables on the Make command line
 JUNIT_JAR = /usr/share/java/junit4.jar
-DESTDIR   = dist/$(project)
-
-# Project information
-project = hello-java
-modname = org.status6.hello
-appname = HelloJava
-version = 1.0.0
-
-# Package metadata
-description = "Sample Java application"
-copyright   = "Copyright (C) 2020 John Neffenger"
-vendor      = "John Neffenger"
-email       = john@status6.com
-categories  = "Development;ConsoleOnly;"
-section     = java
-revision    = 1
+DESTDIR   = dist/$(app)
 
 # Commands
-JAVAC = $(JAVA_HOME)/bin/javac
-JAR   = $(JAVA_HOME)/bin/jar
-JAVA  = $(JAVA_HOME)/bin/java
-JDOC  = $(JAVA_HOME)/bin/javadoc
-JLINK = $(JAVA_HOME)/bin/jlink
-JPKG  = $(JAVA_HOME)/bin/jpackage
+JAVA     = $(JAVA_HOME)/bin/java
+JAVAC    = $(JAVA_HOME)/bin/javac
+JAVADOC  = $(JAVA_HOME)/bin/javadoc
+JAR      = $(JAVA_HOME)/bin/jar
+JLINK    = $(JAVA_HOME)/bin/jlink
+JPACKAGE = $(JAVA_HOME)/bin/jpackage
 
 # Command options
-JAVAC_OPT = --release $(release)
-JAR_OPT   = --create
-JDOC_OPT  = -quiet --source-path src/main/java
-
 JLINK_OPT = --strip-debug --no-header-files --no-man-pages \
-            --add-modules $(modname) --launcher $(appname)=$(modname)
+    --add-modules $(mod_world),$(mod_swing) \
+    --launcher $(cmd_swing)=$(mod_swing) \
+    --launcher $(cmd_world)=$(mod_world)
 
-JPKG_OPT  = --module $(modname) --name $(appname) \
-            --app-version $(version) --description $(description) \
-            --copyright $(copyright) --vendor $(vendor) \
-            --icon images/icon.png --license-file LICENSE
+# The following issue is fixed in JDK 16:
+# jpackage is unable to generate working EXE for add-launcher configurations
+# https://bugs.openjdk.java.net/browse/JDK-8253426
+JPACKAGE_OPT = --name $(cmd_swing) --module $(mod_swing) \
+    --add-launcher $(cmd_world)=conf/$(cmd_world).properties \
+    --add-modules $(mod_world) --app-version $(ver) \
+    --copyright $(copyright) --description $(description) \
+    --vendor $(vendor) --icon $(icon) --license-file $(license)
 
 # Debian package options
-debian = --type deb --linux-package-name $(project) \
-    --linux-deb-maintainer $(email) --linux-menu-group $(categories) \
-    --linux-app-category $(section) --linux-app-release $(revision)
+deb = --type deb --linux-package-name $(app) \
+    --linux-deb-maintainer $(email) --linux-menu-group $(group) \
+    --linux-app-release $(revision) --linux-app-category $(category)
 
-# Java source files
-sources := $(shell find src -name "*.java")
+# Defines a single space character
+sp := $(subst ,, )
 
-# Root source files for the Java compiler
-root_info = src/main/java/module-info.java
-root_main = src/main/java/org/status6/hello/HelloJava.java
-root_test = src/test/java/org/status6/hello/HelloJavaTest.java
-list_main = $(root_info) $(root_main)
-list_test = $(root_test) $(root_main)
+# Output directories
+out = build/classes
+doc = build/apidocs
+tst = build/testing
 
-# Main and test classes
-main_class = org.status6.hello.HelloJava
-test_class = org.status6.hello.HelloJavaTest
-main_junit = org.junit.runner.JUnitCore
+# Main JUnit class and test classes
+junit = org.junit.runner.JUnitCore
+tests = $(pkg).world.HelloTest $(pkg).swing.HelloTest
 
-# Application packages
-package_jar = dist/$(project)-$(version).jar
-package_deb = dist/$(project)_$(version)-$(revision)_$(arch).deb
-package_tar = dist/$(project)-$(version)-linux-$(arch).tar.gz
+# Module sources and colon-separated module path of all prerequisites
+srcpath = --module-source-path "./*/src/main/java"
+modpath = --module-path $(subst $(sp),:,$^)
 
-# Other artifacts
-javadoc_jar = dist/$(project)-$(version)-javadoc.jar
-sources_jar = dist/$(project)-$(version)-sources.jar
-testing_jar = dist/$(project)-$(version)-testing.jar
+# Lists all non-module Java source files for testing
+srctest = $(shell find $(pkg).*/src -name "*.java" \
+            -a ! -name module-info.java)
 
-# Options for the modular executable JAR file
-modular_jar = --main-class $(main_class) --module-version $(version)
+# Lists prerequisites in pattern rules using secondary expansion
+srcmain = $$(shell find $(pkg).%/src/main -name "*.java")
 
-# Classpath options
-cp_junit = --class-path $(JUNIT_JAR)
-cp_tests = --class-path $(testing_jar):$(JUNIT_JAR)
+# Executable JAR options in pattern rules
+execjar = --main-class $(pkg).$*.Hello --module-version $(ver)
 
 # ======================================================================
 # Pattern Rules
 # ======================================================================
 
-%.sha256: %
+.SECONDEXPANSION:
+
+dist/hello-%-$(ver).jar: $(srcmain) | dist
+	$(JAVAC) --release $(rel) -d $(out) $(srcpath) --module $(pkg).$*
+	$(JAR) --create --file $@ $(execjar) -C $(out)/$(pkg).$* .
+
+dist/hello-%-$(ver)-javadoc.jar: $(srcmain) | dist
+	$(JAVADOC) -quiet -d $(doc)/$(pkg).$* $(srcpath) --module $(pkg).$*
+	$(JAR) --create --file $@ -C $(doc)/$(pkg).$* .
+
+dist/hello-%-$(ver)-sources.jar: $(srcmain) | dist
+	$(JAR) --create --file $@ -C $(pkg).$*/src/main/java .
+
+dist/%.sha256: dist/%
 	cd $(@D); sha256sum $(<F) > $(@F)
+
+run-%: dist/hello-%-$(ver).jar
+	$(JAVA) -jar $<
 
 # ======================================================================
 # Explicit Rules
 # ======================================================================
 
-.PHONY: all package install linux run test clean
+.PHONY: all javadoc sources package install linux run test clean
 
-all: $(package_jar)
+all: dist/$(jar_world) dist/$(jar_swing)
 
-package: $(package_jar) $(javadoc_jar) $(sources_jar)
+javadoc: dist/$(doc_world) dist/$(doc_swing)
 
-install: $(package_jar) $(DESTDIR)
+sources: dist/$(src_world) dist/$(src_swing)
 
-linux: $(package_deb).sha256 $(package_tar).sha256
+package: all javadoc sources
+
+install: $(DESTDIR)
+
+linux: dist/$(package_tar).sha256 dist/$(package_deb).sha256
+
+run: run-world run-swing
 
 dist:
 	mkdir -p $@
 
-$(package_jar): $(sources) | dist
-	$(JAVAC) $(JAVAC_OPT) -d build/classes $(list_main)
-	$(JAR) $(JAR_OPT) --file $@ $(modular_jar) -C build/classes .
-
-$(javadoc_jar): $(sources) | dist
-	$(JDOC) $(JDOC_OPT) -d build/apidocs $(modname)
-	$(JAR) $(JAR_OPT) --file $@ -C build/apidocs .
-
-$(sources_jar): $(sources) | dist
-	$(JAR) $(JAR_OPT) --file $@ -C src/main/java .
-
-$(DESTDIR): export JAVA_TOOL_OPTIONS = $(maxheap)
-$(DESTDIR): $(package_jar)
+# The strip command works around the following issue, fixed in JDK 13:
+# Create a jlink plugin for stripping debug info symbols from native libraries
+# https://bugs.openjdk.java.net/browse/JDK-8214796
+$(DESTDIR): dist/$(jar_world) dist/$(jar_swing)
 	rm -rf $(DESTDIR)
-	$(JLINK) $(JLINK_OPT) --module-path $< --output $@
+	$(JLINK) $(JLINK_OPT) $(modpath) --output $@
+	strip --strip-debug $(DESTDIR)/lib/server/libjvm.so
 
-$(package_deb): export JAVA_TOOL_OPTIONS = $(maxheap)
-$(package_deb): $(package_jar)
-	$(JPKG) $(JPKG_OPT) $(debian) --module-path $< --dest $(@D)
-
-$(package_tar): $(DESTDIR)
+dist/$(package_tar): $(DESTDIR)
 	tar --create --file $@ --gzip -C $(<D) $(<F)
 
-$(testing_jar): $(sources) | dist
-	$(JAVAC) $(JAVAC_OPT) -d build/test-classes $(cp_junit) $(list_test)
-	$(JAR) $(JAR_OPT) --file $@ -C build/test-classes .
+dist/$(package_deb): dist/$(jar_world) dist/$(jar_swing)
+	$(JPACKAGE) $(JPACKAGE_OPT) $(deb) $(modpath) --dest $(@D)
 
-run: $(package_jar)
-	$(JAVA) -jar $<
+dist/$(jar_tests): $(srctest) | dist
+	$(JAVAC) --release $(rel) -d $(tst) --class-path $(JUNIT_JAR) $^
+	$(JAR) --create --file $@ -C $(tst) .
 
-test: $(testing_jar)
-	$(JAVA) $(cp_tests) $(main_junit) $(test_class)
+test: dist/$(jar_tests)
+	$(JAVA) --class-path $<:$(JUNIT_JAR) $(junit) $(tests)
 
 clean:
 	rm -rf build dist

@@ -14,28 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.status6.hello;
 
 /**
- * A Java application that prints "Hello World!" to standard output.
+ * Module information for the sample Java console application.
  */
-public class HelloJava {
-
-    /**
-     * A method for unit testing.
-     *
-     * @return <code>true</code>
-     */
-    static boolean isTrue() {
-        return true;
-    }
-
-    /**
-     * The entry point for this application.
-     *
-     * @param args command-line arguments
-     */
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
-    }
+@SuppressWarnings("module")
+module org.status6.hello.world {
+    requires java.base;
 }

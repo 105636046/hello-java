@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=HelloJava
+Comment=Sample Java applications
+Exec=hello-java
+Icon=${SNAP}/meta/gui/hello-java.png
+Terminal=true
+Type=Application
+Categories=Development;Building;

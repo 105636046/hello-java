@@ -1,39 +1,102 @@
+# snapcraft.yaml - builds a Snap package of the Java applications
+# Copyright (C) 2020 John Neffenger
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 name: hello-java
 title: Hello Java!
-summary: Sample Java application
+summary: Sample Java applications
 description: |
   This project is my template for building and packaging Java
-  applications. It uses Maven conventions for its directory structure
-  and includes a sample application that prints "Hello World!" to
-  standard output. It runs only as a console application from the
-  Terminal with the command `hello-java`.
+  applications. It follows the conventions of Apache Maven for
+  its directory structure and includes two applications that print
+  "Hello World!" to standard output: a Java Swing application and a
+  Java console application.
 
-  For more information, including the source code and build
-  files, see the README file for this project on GitHub
-  (https://github.com/jgneff/hello-java).
+  For more information, including the source code and build files,
+  see the README file for this project on GitHub:
+
+  https://github.com/jgneff/hello-java
+
+  Java and OpenJDK are trademarks or registered trademarks of Oracle
+  and/or its affiliates.
 version: '1.0.0'
 license: GPL-3.0+
 
 base: core20
-grade: devel
+grade: stable
 confinement: strict
 
 architectures:
-  - build-on: amd64
-  - build-on: arm64
-  - build-on: armhf
-  - build-on: ppc64el
-  - build-on: s390x
+- build-on: amd64
 
 apps:
   hello-java:
-    command: bin/HelloJava
+    command: bin/HelloSwing
+    environment:
+      LC_ALL: C.UTF-8
+    plugs:
+    - desktop
+    - desktop-legacy
+    - wayland
+    - unity7
+  console:
+    command: bin/HelloWorld
+    environment:
+      LC_ALL: C.UTF-8
   java:
     command: bin/java
+    environment:
+      LC_ALL: C.UTF-8
 
 parts:
+  lib:
+    plugin: nil
+    # Adds Snapcraft list of missing libraries plus libfontconfig1
+    stage-packages:
+    - libasound2
+    - libfreetype6
+    - libjpeg-turbo8
+    - liblcms2-2
+    - libpng16-16
+    - libx11-6
+    - libxau6
+    - libxcb1
+    - libxdmcp6
+    - libxext6
+    - libxi6
+    - libxrender1
+    - libxtst6
+    - libfontconfig1
+
   app:
+    after: [lib]
     plugin: make
     source: https://github.com/jgneff/hello-java.git
     source-depth: 1
-    build-packages: [openjdk-14-jdk-headless]
+    build-environment:
+    - JAVA_HOME: /snap/openjdk/current/jvm
+    build-snaps: [openjdk/latest/candidate]
+
+  del:
+    after: [app]
+    plugin: nil
+    # Deletes files and links already available in the base core20 snap
+    override-prime: |
+      set -o xtrace
+      cd $SNAPCRAFT_PRIME
+      base=/snap/core20/current
+      find * -type f -exec test -f "$base/{}" \; -delete
+      find * -type l -exec test -L "$base/{}" \; -delete
+      find * -type d -empty -delete

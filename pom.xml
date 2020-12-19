@@ -6,10 +6,10 @@
     <groupId>org.status6.hello</groupId>
     <artifactId>hello-java</artifactId>
     <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>hello-java</name>
-    <description>Sample Java application</description>
+    <description>Sample Java applications</description>
     <url>https://github.com/jgneff/hello-java</url>
     <inceptionYear>2020</inceptionYear>
     <licenses>
@@ -19,11 +19,15 @@
         </license>
     </licenses>
 
+    <modules>
+        <module>org.status6.hello.swing</module>
+        <module>org.status6.hello.world</module>
+    </modules>
+
     <properties>
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.hint.license>gpl30</netbeans.hint.license>
-        <exec.mainClass>org.status6.hello.HelloJava</exec.mainClass>
 
         <!-- Javadoc Plugin user properties
             MJAVADOC-595 javadoc not found using java.home

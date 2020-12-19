@@ -14,21 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.status6.hello;
-
-import org.junit.Assert;
-import org.junit.Test;
+package org.status6.hello.world;
 
 /**
- * Unit tests for {@link HelloJava}.
+ * A Java console application that prints "Hello World!" to standard output.
  */
-public class HelloJavaTest {
+public class Hello {
 
     /**
-     * Tests a method that should return <code>true</code>.
+     * A method for unit testing.
+     *
+     * @return <code>true</code>
      */
-    @Test
-    public void testTrue() {
-        Assert.assertTrue(HelloJava.isTrue());
+    static boolean isTrue() {
+        return true;
+    }
+
+    /**
+     * The entry point for this application.
+     *
+     * @param args command-line arguments
+     */
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
     }
 }

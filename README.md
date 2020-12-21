@@ -1,6 +1,6 @@
 ## ![Duke, the Java mascot, waving](images/icon.png) Hello Java!
 
-This project is my template for building and packaging Java applications. It follows the conventions of Apache Maven for its directory structure and includes two applications that print "Hello World!" to standard output:
+This project is my template for building and packaging Java applications. It follows the conventions of Apache Maven for its directory structure and includes two sample applications that print "Hello World!" to standard output:
 
 * HelloSwing - a Java Swing application with a graphical user interface
 * HelloWorld - a Java console application with a command-line interface
@@ -53,7 +53,7 @@ The Maven build can run on any system, but the Makefile is configured by default
 $ multipass launch --name primary --cpus 2 --mem 4G groovy
 ```
 
-Run all of the commands to build the software from the directory into which you cloned this repository, as follows:
+All of the commands to build the software are from the directory into which you cloned this repository, as follows:
 
 ```console
 $ git clone https://github.com/jgneff/hello-java.git

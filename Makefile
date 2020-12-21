@@ -96,10 +96,11 @@ JLINK_OPT = --strip-debug --no-header-files --no-man-pages \
 # jpackage is unable to generate working EXE for add-launcher configurations
 # https://bugs.openjdk.java.net/browse/JDK-8253426
 JPACKAGE_OPT = --name $(cmd_swing) --module $(mod_swing) \
+    --add-modules $(mod_world) \
     --add-launcher $(cmd_world)=conf/$(cmd_world).properties \
-    --add-modules $(mod_world) --app-version $(ver) \
-    --copyright $(copyright) --description $(description) \
-    --vendor $(vendor) --icon $(icon) --license-file $(license)
+    --app-version $(ver) --copyright $(copyright) \
+    --description $(description) --vendor $(vendor) \
+    --icon $(icon) --license-file $(license)
 
 # Debian package options
 deb = --type deb --linux-package-name $(app) \
@@ -109,7 +110,8 @@ deb = --type deb --linux-package-name $(app) \
 # Defines a single space character
 sp := $(subst ,, )
 
-# Output directories
+# Source and output directories
+src = "./*/src/main/java"
 out = build/classes
 doc = build/apidocs
 tst = build/testing
@@ -119,8 +121,11 @@ junit = org.junit.runner.JUnitCore
 tests = $(pkg).world.HelloTest $(pkg).swing.HelloTest
 
 # Module sources and colon-separated module path of all prerequisites
-srcpath = --module-source-path "./*/src/main/java"
+srcpath = --module-source-path $(src)
 modpath = --module-path $(subst $(sp),:,$^)
+
+# Classpath additions for compiling and running tests
+clspath = $(JUNIT_JAR)
 
 # Lists all non-module Java source files for testing
 srctest = $(shell find $(pkg).*/src -name "*.java" \
@@ -193,11 +198,11 @@ dist/$(package_deb): dist/$(jar_world) dist/$(jar_swing)
 	$(JPACKAGE) $(JPACKAGE_OPT) $(deb) $(modpath) --dest $(@D)
 
 dist/$(jar_tests): $(srctest) | dist
-	$(JAVAC) --release $(rel) -d $(tst) --class-path $(JUNIT_JAR) $^
+	$(JAVAC) --release $(rel) -d $(tst) --class-path $(clspath) $^
 	$(JAR) --create --file $@ -C $(tst) .
 
 test: dist/$(jar_tests)
-	$(JAVA) --class-path $<:$(JUNIT_JAR) $(junit) $(tests)
+	$(JAVA) --class-path $<:$(clspath) $(junit) $(tests)
 
 clean:
 	rm -rf build dist

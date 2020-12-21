@@ -34,7 +34,7 @@ description: |
 version: '1.0.0'
 license: GPL-3.0+
 
-base: core20
+base: core18
 grade: stable
 confinement: strict
 
@@ -43,7 +43,7 @@ architectures:
 
 apps:
   hello-java:
-    command: bin/HelloSwing
+    command: bin/java -jar $SNAP/org.status6.hello.swing/hello-swing-1.0.0.jar
     environment:
       LC_ALL: C.UTF-8
     plugs:
@@ -52,7 +52,7 @@ apps:
     - wayland
     - unity7
   console:
-    command: bin/HelloWorld
+    command: bin/java -jar $SNAP/org.status6.hello.world/hello-world-1.0.0.jar
     environment:
       LC_ALL: C.UTF-8
   java:
@@ -61,33 +61,14 @@ apps:
       LC_ALL: C.UTF-8
 
 parts:
-  lib:
-    plugin: nil
-    # Adds Snapcraft list of missing libraries plus libfontconfig1
-    stage-packages:
-    - libasound2
-    - libfreetype6
-    - libjpeg-turbo8
-    - liblcms2-2
-    - libpng16-16
-    - libx11-6
-    - libxau6
-    - libxcb1
-    - libxdmcp6
-    - libxext6
-    - libxi6
-    - libxrender1
-    - libxtst6
-    - libfontconfig1
-
   app:
-    after: [lib]
-    plugin: make
+    plugin: maven
     source: https://github.com/jgneff/hello-java.git
     source-depth: 1
-    build-environment:
-    - JAVA_HOME: /snap/openjdk/current/jvm
-    build-snaps: [openjdk/latest/candidate]
+    maven-options: [-DskipTests=true]
+    maven-targets:
+    - org.status6.hello.swing
+    - org.status6.hello.world
 
   del:
     after: [app]
@@ -100,3 +81,7 @@ parts:
       find * -type f -exec test -f "$base/{}" \; -delete
       find * -type l -exec test -L "$base/{}" \; -delete
       find * -type d -empty -delete
+
+layout:
+  /etc/fonts:
+    bind: $SNAP/etc/fonts

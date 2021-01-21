@@ -1,5 +1,5 @@
 # snapcraft.yaml - builds a Snap package of the Java applications
-# Copyright (C) 2020 John Neffenger
+# Copyright (C) 2020-2021 John Neffenger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,8 +21,10 @@ description: |
   This project is my template for building and packaging Java
   applications. It follows the conventions of Apache Maven for its
   directory structure and includes two sample applications that print
-  "Hello World!" to standard output: a Java Swing application and a
-  Java console application.
+  "Hello World!" to standard output:
+
+  - a Java console application with a command-line interface, and
+  - a Java Swing application with a graphical user interface.
 
   For more information, including the source code and build files,
   see the README file for this project on GitHub:
@@ -40,9 +42,17 @@ confinement: strict
 
 architectures:
 - build-on: amd64
+- build-on: arm64
+- build-on: armhf
+- build-on: ppc64el
+- build-on: s390x
 
 apps:
   hello-java:
+    command: bin/HelloWorld
+    environment:
+      LC_ALL: C.UTF-8
+  swing:
     command: bin/HelloSwing
     environment:
       LC_ALL: C.UTF-8
@@ -50,11 +60,7 @@ apps:
     - desktop
     - desktop-legacy
     - wayland
-    - unity7
-  console:
-    command: bin/HelloWorld
-    environment:
-      LC_ALL: C.UTF-8
+    - x11
   java:
     command: bin/java
     environment:
@@ -83,20 +89,20 @@ parts:
   app:
     after: [lib]
     plugin: make
-    source: https://github.com/jgneff/hello-java.git
-    source-depth: 1
+    source: .
+    source-type: local
     build-environment:
-    - JAVA_HOME: /snap/openjdk/current/jvm
+    - JAVA_HOME: /snap/openjdk/current/jdk
     build-snaps: [openjdk/latest/candidate]
 
   del:
     after: [app]
     plugin: nil
-    # Deletes files and links already available in the base core20 snap
+    # Deletes files and links already available in the base snap
     override-prime: |
       set -o xtrace
       cd $SNAPCRAFT_PRIME
       base=/snap/core20/current
       find * -type f -exec test -f "$base/{}" \; -delete
       find * -type l -exec test -L "$base/{}" \; -delete
-      find * -type d -empty -delete
+      find * -type d -empty -exec test -d "$base/{}" \; -delete

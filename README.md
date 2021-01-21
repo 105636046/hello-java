@@ -107,15 +107,23 @@ alias mvn='mvn -s /etc/maven/settings-debian.xml'
 
 #### GNU Make
 
-The [Makefile](Makefile) builds the same JAR files as Maven, but it does so using only the tools that come with the Java Development Kit. You can install GNU Make, OpenJDK 11, and the JUnit testing framework with the command:
+The [Makefile](Makefile) builds the same JAR files as Maven, but it does so using only the tools that come with the Java Development Kit. You can install GNU Make and the latest release of OpenJDK with the commands shown below. See the [OpenJDK Snap](https://github.com/jgneff/openjdk) repository on GitHub for details.
 
 ```console
-$ sudo apt install make openjdk-11-jdk junit4
+$ sudo apt install make
+$ sudo snap install openjdk
+```
+
+To run all of the Makefile targets, you'll also need the JUnit testing framework and two extra packages for building the Debian package:
+
+```console
+$ sudo apt install junit4 binutils fakeroot
 ```
 
 Run `make` with the targets shown below to build the JAR files into the `dist` directory and run the unit test cases:
 
 ```console
+$ . $(openjdk)
 $ make clean package test
 ```
 
@@ -131,16 +139,9 @@ With OpenJDK 14 or later, the Makefile can also package the project as a self-co
 * Debian package for installing into `/opt` on Debian-based systems, and
 * Snap package for testing and uploading to the [Snap Store](https://snapcraft.io/store).
 
-You can get the latest OpenJDK release by installing the OpenJDK Snap package using the command shown below. See the [OpenJDK Snap](https://github.com/jgneff/openjdk) repository on GitHub for details.
+Run the following commands to build the compressed archive and Debian package for Linux:
 
 ```console
-$ sudo snap install openjdk
-```
-
-After installing the OpenJDK Snap package, run the following commands to build the compressed archive and Debian package for Linux:
-
-```console
-$ . $(openjdk)
 $ make linux
 ```
 

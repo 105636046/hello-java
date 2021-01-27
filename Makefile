@@ -14,19 +14,28 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# ======================================================================
+# Build Requirements
 #
-# This Makefile requires the following packages:
-#   $ sudo apt install make openjdk-11-jdk-headless
+# On Debian-based systems:
+#   $ sudo apt install make default-jdk-headless
 #   $ sudo apt install junit4 binutils fakeroot
+#
+# On Fedora-based systems:
+#   $ sudo dnf install make
+#   $ sudo dnf install java-latest-openjdk-devel
+#   $ sudo dnf install java-latest-openjdk-jmods
+#   $ sudo dnf install junit binutils dpkg fakeroot
+#
+# Source the environment variables (modify as necessary):
+#   bin/debian.env - for Debian-based systems (Makefile defaults)
+#   bin/fedora.env - for Fedora-based systems
 #
 # The Snapcraft Make plugin runs this Makefile with:
 #   $ make; make install DESTDIR=$SNAPCRAFT_PART_INSTALL
 #
-# Note: The jpackage tool is available in JDK 14 or later.
+# Note: The 'jpackage' tool is available in JDK 14 or later.
 # ======================================================================
-
-# OpenJDK version
-jdk = 11
 
 # Java release for source code and target platform
 rel = 11
@@ -64,19 +73,21 @@ src_swing = hello-swing-$(ver)-sources.jar
 doc_world = hello-world-$(ver)-javadoc.jar
 doc_swing = hello-swing-$(ver)-javadoc.jar
 
-# Debian architecture of build machine
+# Machine hardware name and Debian architecture
+mach := $(shell uname --machine)
 arch := $(shell dpkg --print-architecture)
 
 # Package file names
-package_tar = $(app)-$(ver)-linux-$(arch).tar.gz
+package_tar = $(app)-$(ver)-linux-$(mach).tar.gz
 package_deb = $(app)_$(ver)-$(revision)_$(arch).deb
 
 # Overridden by variables from the environment
-JAVA_HOME ?= /usr/lib/jvm/java-$(jdk)-openjdk-$(arch)
+JAVA_HOME ?= /usr/lib/jvm/default-java
+JUNIT4    ?= /usr/share/java/junit4.jar
+HAMCREST  ?= /usr/share/java/hamcrest-core.jar
 
 # Overridden by variables on the Make command line
-JUNIT_JAR = /usr/share/java/junit4.jar
-DESTDIR   = dist/$(app)
+DESTDIR = dist/$(app)
 
 # Commands
 JAVA     = $(JAVA_HOME)/bin/java
@@ -125,7 +136,7 @@ srcpath = --module-source-path $(src)
 modpath = --module-path $(subst $(sp),:,$^)
 
 # Classpath additions for compiling and running tests
-clspath = $(JUNIT_JAR)
+clspath = $(JUNIT4):$(HAMCREST)
 
 # Lists all non-module Java source files for testing
 srctest = $(shell find $(pkg).*/src -name "*.java" \

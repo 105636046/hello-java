@@ -49,10 +49,6 @@ architectures:
 
 apps:
   hello-java:
-    command: bin/HelloWorld
-    environment:
-      LC_ALL: C.UTF-8
-  swing:
     command: bin/HelloSwing
     environment:
       LC_ALL: C.UTF-8
@@ -61,6 +57,10 @@ apps:
     - desktop-legacy
     - wayland
     - x11
+  console:
+    command: bin/HelloWorld
+    environment:
+      LC_ALL: C.UTF-8
   java:
     command: bin/java
     environment:

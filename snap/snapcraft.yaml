@@ -16,7 +16,7 @@
 
 name: hello-java
 title: Hello Java!
-summary: Sample Java applications
+summary: Sample Java Swing and console applications
 description: |
   This project is my template for building and packaging Java
   applications. It follows the conventions of Apache Maven for its
@@ -33,6 +33,7 @@ description: |
 
   Java and OpenJDK are trademarks or registered trademarks of Oracle
   and/or its affiliates.
+
 version: '1.0.0'
 license: GPL-3.0+
 

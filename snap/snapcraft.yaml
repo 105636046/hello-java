@@ -74,13 +74,13 @@ parts:
     stage-packages:
     - libasound2
     - libfreetype6
+    - libgif7
+    - libgraphite2-3
+    - libharfbuzz0b
     - libjpeg-turbo8
     - liblcms2-2
     - libpng16-16
     - libx11-6
-    - libxau6
-    - libxcb1
-    - libxdmcp6
     - libxext6
     - libxi6
     - libxrender1
@@ -92,9 +92,7 @@ parts:
     plugin: make
     source: .
     source-type: local
-    build-environment:
-    - JAVA_HOME: /snap/openjdk/current/jdk
-    build-snaps: [openjdk/latest/candidate]
+    build-packages: [openjdk-16-jdk-headless]
 
   del:
     after: [app]

@@ -17,24 +17,22 @@
 # ======================================================================
 # Build Requirements
 #
-# On Debian-based systems:
-#   $ sudo apt install make default-jdk-headless
+# Debian-based systems
+#   $ sudo apt install make openjdk-16-jdk-headless
 #   $ sudo apt install junit4 binutils fakeroot
 #
-# On Fedora-based systems:
+# Fedora-based systems
 #   $ sudo dnf install make
 #   $ sudo dnf install java-latest-openjdk-devel
 #   $ sudo dnf install java-latest-openjdk-jmods
 #   $ sudo dnf install junit binutils dpkg fakeroot
 #
-# Source the environment variables (modify as necessary):
+# Environment variables
 #   bin/debian.env - for Debian-based systems (Makefile defaults)
 #   bin/fedora.env - for Fedora-based systems
 #
 # The Snapcraft Make plugin runs this Makefile with:
 #   $ make; make install DESTDIR=$SNAPCRAFT_PART_INSTALL
-#
-# Note: The 'jpackage' tool is available in JDK 14 or later.
 # ======================================================================
 
 # Java release for source code and target platform
@@ -82,7 +80,7 @@ package_tar = $(app)-$(ver)-linux-$(mach).tar.gz
 package_deb = $(app)_$(ver)-$(revision)_$(arch).deb
 
 # Overridden by variables from the environment
-JAVA_HOME ?= /usr/lib/jvm/default-java
+JAVA_HOME ?= /usr/lib/jvm/java-16-openjdk-amd64
 JUNIT4    ?= /usr/share/java/junit4.jar
 HAMCREST  ?= /usr/share/java/hamcrest-core.jar
 
@@ -103,9 +101,6 @@ JLINK_OPT = --strip-debug --no-header-files --no-man-pages \
     --launcher $(cmd_swing)=$(mod_swing) \
     --launcher $(cmd_world)=$(mod_world)
 
-# The following issue is fixed in JDK 16:
-# jpackage is unable to generate working EXE for add-launcher configurations
-# https://bugs.openjdk.java.net/browse/JDK-8253426
 JPACKAGE_OPT = --name $(cmd_swing) --module $(mod_swing) \
     --add-modules $(mod_world) \
     --add-launcher $(cmd_world)=conf/$(cmd_world).properties \
@@ -194,13 +189,9 @@ run: run-world run-swing
 dist:
 	mkdir -p $@
 
-# The strip command works around the following issue, fixed in JDK 13:
-# Create a jlink plugin for stripping debug info symbols from native libraries
-# https://bugs.openjdk.java.net/browse/JDK-8214796
 $(DESTDIR): dist/$(jar_world) dist/$(jar_swing)
 	rm -rf $(DESTDIR)
 	$(JLINK) $(JLINK_OPT) $(modpath) --output $@
-	strip --strip-debug $(DESTDIR)/lib/server/libjvm.so
 
 dist/$(package_tar): $(DESTDIR)
 	tar --create --file $@ --gzip -C $(<D) $(<F)

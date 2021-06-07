@@ -80,7 +80,7 @@ package_tar = $(app)-$(ver)-linux-$(mach).tar.gz
 package_deb = $(app)_$(ver)-$(revision)_$(arch).deb
 
 # Overridden by variables from the environment
-JAVA_HOME ?= /usr/lib/jvm/java-16-openjdk-amd64
+JAVA_HOME ?= /usr/lib/jvm/java-16-openjdk-$(arch)
 JUNIT4    ?= /usr/share/java/junit4.jar
 HAMCREST  ?= /usr/share/java/hamcrest-core.jar
 

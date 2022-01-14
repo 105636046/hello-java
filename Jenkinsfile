@@ -1,4 +1,4 @@
-node(master){
+node(built-in node){
   
      stage(scm){
             git branch: 'main', url: 'https://github.com/105636046/hello-java.git'

@@ -10,7 +10,7 @@ node('any'){
                sh ""
                }
      stage('Docker'){
-               sh 'copy ***/*jar  .'
+               sh 'cp ***/*jar  .'
                sh "docker image build -t ."
                }
      stage('Kubernetes'){

@@ -1,4 +1,4 @@
-node('any'){
+node(any){
   
      stage('scm'){
             git branch: 'main', url: 'https://github.com/105636046/hello-java.git'

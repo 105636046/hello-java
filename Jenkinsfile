@@ -10,8 +10,8 @@ node('any'){
                sh ""
                }
      stage('Docker'){
-               sh 'cp ***/hello-world-1.0.0.jar  .'
                sh 'ls -al'
+               sh 'cp ***/hello-world-1.0.0.jar  .'
                sh "docker image build -t ."
                }
      stage('Kubernetes'){

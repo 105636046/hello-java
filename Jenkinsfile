@@ -4,7 +4,7 @@ node('any'){
             git branch: 'main', url: 'https://github.com/105636046/hello-java.git'
                }
      stage('build'){
-            sh "maven clean package"
+            sh "mvn clean install"
                }
      stage('Sonar'){
                sh ""

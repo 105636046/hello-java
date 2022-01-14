@@ -11,6 +11,7 @@ node('any'){
                }
      stage('Docker'){
                sh 'cp ***/*jar  .'
+               sh 'ls -al'
                sh "docker image build -t ."
                }
      stage('Kubernetes'){

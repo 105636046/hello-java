@@ -13,7 +13,8 @@ node('any'){
                sh "curl -fsSL https://get.docker.com -o get-docker.sh"
                sh 'sudo sh get-docker.sh'
                sh 'sudo usermod -aG docker $USER'
-               
+               sh 'sudo chown "$USER":"$USER" /home/"$USER"/.docker -R && sudo chmod g+rwx "$HOME/.docker" -R'
+               sh 'sudo systemctl enable docker.service && sudo systemctl enable containerd.service'
                sh "docker info && docker version "
                }
      stage('Kubernetes'){

@@ -1,4 +1,4 @@
-node('any'){
+node('any'){properties([overrideIndexTriggers(true), parameters([string(defaultValue: 'dev', name: 'env'), run(filter: 'ALL', name: 'env', projectName: 'int'), run(filter: 'ALL', name: 'env', projectName: 'prod')])])
   
      stage('scm'){
             git branch: 'main', url: 'https://github.com/105636046/hello-java.git'

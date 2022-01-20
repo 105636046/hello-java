@@ -1,5 +1,5 @@
 node('any'){
-  properties([parameters([text(defaultValue: 'dev int prod', name: 'BRANCH_NAME')])])
+ properties([parameters([string(defaultValue: 'dev', name: 'BRANCH_NAME'), choice(choices: ['dev'], name: 'BRANCH_NAME'), choice(choices: ['int'], name: 'BRANCH_NAME'), choice(choices: ['prod'], name: 'BRANCH_NAME')])])
   
      stage('scm'){
             git branch: 'main', url: 'https://github.com/105636046/hello-java.git'

@@ -1,4 +1,4 @@
 FROM openjdk:11
-RUN  ***.*.jar .
+COPY helloworld-2.1.jar .
 EXPOSE 8080
-CMD ["java", "-jar", "*.jar"]
+CMD ["java", "-jar", "helloworld-2.1.jar"]
